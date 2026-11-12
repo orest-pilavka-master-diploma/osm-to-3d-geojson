@@ -11,12 +11,34 @@ import scala.reflect.ClassTag
 case class CommonConfig(
     defaultStorageLevel: String,
     workflows: Option[String] = None,
+    geohashPrecision: Int,
 ) {
   val sparkStorageLevel: StorageLevel = StorageLevel.fromString(defaultStorageLevel)
   val enabledWorkflows: Set[String]   = workflows.map(_.split(",")).getOrElse(Array.empty[String]).map(_.trim).filterNot(_.isBlank).toSet
 }
 
 case class OsmConfig(osmInPath: String)
+
+case class BoundingBoxConfig(minLon: Double, minLat: Double, maxLon: Double, maxLat: Double)
+
+/**
+  * Overture Maps buildings source + OSM/Overture merge settings.
+  *
+  * @param enabled           when false the Overture reader and the merge are not executed at all
+  * @param overtureInPath    path / glob to the Overture buildings parquet files (theme=buildings/type=building)
+  * @param bufferMeters      buffer (in meters) built around every OSM building before matching
+  * @param minOverlapRatio   share of the Overture geometry that must lie inside the OSM buffer (0.9 = 90%)
+  * @param gridCellDegrees   size of the grid cell used for the spatial pre-join
+  * @param bbox              optional bounding box to read from Overture; derived from OSM buildings if absent
+  */
+case class OvertureConfig(
+    enabled: Boolean = false,
+    overtureInPath: String = "NA",
+    bufferMeters: Double = 1.0,
+    minOverlapRatio: Double = 0.9,
+    gridCellDegrees: Double = 0.005,
+    bbox: Option[BoundingBoxConfig] = None
+)
 
 case class AdminPlaceConfig(disputedViewPath: String, adminPlaceOut: String, adminPlaceGroundOut: String)
 

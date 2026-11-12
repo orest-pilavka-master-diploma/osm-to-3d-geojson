@@ -34,12 +34,18 @@ case class BuildingAddressProcessor() extends Processor {
   }
 
   private def buildAddress(building: Building, adminNames: Seq[String]): Option[Building] = {
-    val street = building.tags.get("addr:street")
-    street.map { value =>
-      val houseNumber = building.tags.getOrElse("addr:housenumber", "unknown")
-      val city        = adminNames.lift(4).getOrElse("unknown")
+    val street       = building.tags.get("addr:street")
+    val overtureOnly = building.tags.get(BuildingSourceTags.sourceTag).contains(BuildingSourceTags.Overture)
+    val city         = adminNames.lift(4).getOrElse("unknown")
 
-      building.copy(tags = building.tags ++ Map(tagCity -> city, tagStreet -> value, tagHouseNumber -> houseNumber))
+    street match {
+      case Some(value) =>
+        val houseNumber = building.tags.getOrElse("addr:housenumber", "unknown")
+        Some(building.copy(tags = building.tags ++ Map(tagCity -> city, tagStreet -> value, tagHouseNumber -> houseNumber)))
+      case None if overtureOnly =>
+        // Overture buildings carry no address; keep them with the admin-derived city.
+        Some(building.copy(tags = building.tags ++ Map(tagCity -> city, tagStreet -> "unknown", tagHouseNumber -> "unknown")))
+      case None => None
     }
   }
 }

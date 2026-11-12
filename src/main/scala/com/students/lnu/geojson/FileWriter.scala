@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 object FileWriter {
-  private val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+  private[geojson] val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
 
   def write(content: Array[Byte], outPath: String):Unit = {
 

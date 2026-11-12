@@ -7,5 +7,8 @@ case class Building3DModel(
     originalId: String,
     geometry: MultiPolygonWrapper,
     addressString: String,
-    height: Int
+    height: Int,
+    sourceOfHeight: String,
+    geohash: String,
+    dataSource: String = "osm"
 )
